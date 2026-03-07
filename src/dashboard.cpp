@@ -41,12 +41,13 @@ void Dashboard::processInput(int callId, int heroId) {
     return;
   }
   if(StressCall::resolveCall(callId)){
-    hero->setStatus("On-Duty");
+    hero->setStatus("On-Duty  ");
     // get how long it will to resolve the call.
     int resolutionTime = hero->getResolutionTime();
     msgText = Color::green("SUCCESS: ") + hero->getName() + " dispatched! ETA: " + to_string(resolutionTime) + "s.";
     messages.push_back(Message(msgText));
-
+    // increase hero skill level after successful dispatch
+    hero->increaseSkillLevel();
     // Simulate the hero being on-duty for the resolution time, then set them back to available
     thread recoveryThread([hero, resolutionTime]() {
       
@@ -54,12 +55,11 @@ void Dashboard::processInput(int callId, int heroId) {
       std::this_thread::sleep_for(std::chrono::seconds(resolutionTime));
       
       // They are tired, let them rest
-      hero->setStatus("Resting");
+      hero->setStatus("Resting  ");
       std::this_thread::sleep_for(std::chrono::seconds(10)); // 10 seconds of rest
-      
       // Ready for action again!
       hero->setStatus("Available");
-      
+       
     });
     
     recoveryThread.detach();
