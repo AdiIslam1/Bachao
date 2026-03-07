@@ -54,7 +54,9 @@ void showCredits() {
 
     cout << "Developed by:\n";
     cout << "Ahnaf Irtiza Nibir\n";
-    cout << "and Team BACHAO\n";
+    cout << "Saad Al Abeed\n";
+    cout << "Adi Islam\n";
+    cout << "Anas Ibn Aziz\n";
 
     cout << "\nPress enter to return...";
     cin.ignore();
