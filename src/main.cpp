@@ -78,9 +78,6 @@ int main() {
 
   StressCall::generate(get_random(2, 4));
 
-  thread worker(StressCall::printCallList, ref(isRunning));
-  thread heroWorker(Hero::printHeroList, ref(isRunning));
-  thread dashboardWorker(Dashboard::start, ref(isRunning));
 
   while (true) {
         int choice = showMenu();
@@ -97,8 +94,11 @@ int main() {
         else {
             return 0;
         }
-    }
-
+  }
+  
+  thread worker(StressCall::printCallList, ref(isRunning));
+  thread heroWorker(Hero::printHeroList, ref(isRunning));
+  thread dashboardWorker(Dashboard::start, ref(isRunning));
   while (timeToPlay > 0) {
     // Every 20 seconds, generate more calls
     if (timeToPlay < 120 && timeToPlay % 20 == 0) {
