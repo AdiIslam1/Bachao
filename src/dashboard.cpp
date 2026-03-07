@@ -1,5 +1,6 @@
 #include "console_utils.hpp"
 #include <dashboard.hpp>
+#include "stats.hpp"
 #include <limits>
 #include <sstream>
 #include <unistd.h>
@@ -41,6 +42,7 @@ void Dashboard::processInput(int callId, int heroId) {
     return;
   }
   if(StressCall::resolveCall(callId)){
+    Stats::addSuccess();
     hero->setStatus("On-Duty  ");
     // get how long it will to resolve the call.
     int resolutionTime = hero->getResolutionTime();
@@ -64,6 +66,7 @@ void Dashboard::processInput(int callId, int heroId) {
     
     recoveryThread.detach();
   } else {
+    Stats::addFailure();
     msgText = Color::red("ERROR: Failed to resolve Call ID " + to_string(callId) + " with Hero ID " + to_string(heroId) + "!");
     messages.push_back(Message(msgText));
     return;
