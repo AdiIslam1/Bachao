@@ -20,7 +20,7 @@ using namespace std;
 
 class Hero {
 private:
-  static vector<Hero> heroList;
+  static vector<Hero*> heroList;
 
 protected:
   string heroType;
@@ -38,6 +38,14 @@ public:
   int getSkillLevel() const { return skillLevel; }
   string getStatus() const { return status; }
 
+  // setters
+  void setStatus(const string &newStatus) { status = newStatus; }
+  void setSkillLevel(int newSkillLevel);
+  static Hero* getHeroByIndex(int index);
+  // pure virtual function to be implemented by derived classes
+  virtual bool canHandle(const string &newStatus) const = 0;
+  virtual int getResolutionTime() const = 0;
+  void increaseSkillLevel();
   static void printHeroList(atomic<bool> &isRunning);
 };
 
@@ -49,6 +57,8 @@ public:
     this->skillLevel = skillLevel;
     this->status = status;
   };
+  bool canHandle(const string& callType) const override;
+  int getResolutionTime() const override;
 };
 
 class Police : public Hero {
@@ -59,6 +69,8 @@ public:
     this->skillLevel = skillLevel;
     this->status = status;
   };
+  bool canHandle(const string& callType) const override;
+  int getResolutionTime() const override;
 };
 
 class Firefighter : public Hero {
@@ -69,6 +81,8 @@ public:
     this->skillLevel = skillLevel;
     this->status = status;
   };
+  bool canHandle(const string& callType) const override;
+  int getResolutionTime() const override;
 };
 
 #endif

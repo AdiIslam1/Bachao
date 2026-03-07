@@ -29,6 +29,8 @@ public:
   string getAddress() const { return this->address; }
   string getPriority() const { return this->priority; }
   int getTimeLeft() const { return this->timeLeft; }
+  static string getCallType(int index);
+  static bool resolveCall(int index);
   // setters
   void setType(string type) { this->type = type; }
   void setActivity(string activity) { this->activity = activity; }

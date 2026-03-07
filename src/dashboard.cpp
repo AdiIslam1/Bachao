@@ -17,10 +17,59 @@ void Dashboard::processInput(int callId, int heroId) {
   string msgText = "";
 
   // Dispatch message for display
-
   // Implement message logic here (Handle out of bounds inputs too)
-
+  Hero* hero = Hero::getHeroByIndex(heroId);
+  if (hero == nullptr) {
+    msgText = Color::red("ERROR: Hero ID " + to_string(heroId) + " does not exist!");
+    messages.push_back(Message(msgText));
+    return;
+  }
+  if (hero->getStatus() != "Available"){
+    msgText = Color::red("ERROR: " + hero->getName() + " is currently " + hero->getStatus() + "!");
+    messages.push_back(Message(msgText));
+    return;
+  }
+  string callType = StressCall::getCallType(callId);
+  if (callType == "") {
+    msgText = Color::red("ERROR: Call ID " + to_string(callId) + " is invalid or just expired!");
+    messages.push_back(Message(msgText));
+    return;
+  }
+  if (!hero->canHandle(callType)) {
+    msgText = Color::red("ERROR: " + hero->getHeroType() + " cannot handle a " + callType + " emergency!");
+    messages.push_back(Message(msgText));
+    return;
+  }
+  if(StressCall::resolveCall(callId)){
+    hero->setStatus("On-Duty  ");
+    // get how long it will to resolve the call.
+    int resolutionTime = hero->getResolutionTime();
+    msgText = Color::green("SUCCESS: ") + hero->getName() + " dispatched! ETA: " + to_string(resolutionTime) + "s.";
+    messages.push_back(Message(msgText));
+    // increase hero skill level after successful dispatch
+    hero->increaseSkillLevel();
+    // Simulate the hero being on-duty for the resolution time, then set them back to available
+    thread recoveryThread([hero, resolutionTime]() {
+      
+      // Wait for them to finish the job
+      std::this_thread::sleep_for(std::chrono::seconds(resolutionTime));
+      
+      // They are tired, let them rest
+      hero->setStatus("Resting  ");
+      std::this_thread::sleep_for(std::chrono::seconds(10)); // 10 seconds of rest
+      // Ready for action again!
+      hero->setStatus("Available");
+       
+    });
+    
+    recoveryThread.detach();
+  } else {
+    msgText = Color::red("ERROR: Failed to resolve Call ID " + to_string(callId) + " with Hero ID " + to_string(heroId) + "!");
+    messages.push_back(Message(msgText));
+    return;
+  }
   // Dummy message box
+
   msgText = "Dispatching Hero ID " + to_string(heroId) + " to Call Serial " +
             to_string(callId);
   messages.push_back(Message(msgText));
