@@ -4,6 +4,12 @@
 Hero::Hero(const string &heroType)
     : heroType(heroType), name(""), skillLevel(0), status("Available") {}
 
+Hero* Hero::getHeroByIndex(int index) {
+  if (index < 0 || index >= heroList.size())
+    return nullptr;
+  return heroList[index];
+}
+
 void Hero::printHeroList(atomic<bool> &isRunning) {
   const int startCol = 100; // Start column for hero list (right side)
 
@@ -37,7 +43,7 @@ void Hero::printHeroList(atomic<bool> &isRunning) {
       moveCursorSS(row++, startCol);
       ss << idx++ << ". ";
 
-      string type = hero.getHeroType();
+      string type = hero->getHeroType();
       if (type == "Medic")
         ss << Color::red("[MEDIC]");
       else if (type == "Police")
@@ -45,12 +51,12 @@ void Hero::printHeroList(atomic<bool> &isRunning) {
       else if (type == "Firefighter")
         ss << Color::yellow("[FIREFIGHTER]");
 
-      ss << " " << hero.getName();
+      ss << " " << hero->getName();
 
       moveCursorSS(row++, startCol);
-      ss << "   Skill Level: " << hero.getSkillLevel();
+      ss << "   Skill Level: " << hero->getSkillLevel();
 
-      string status = hero.getStatus();
+      string status = hero->getStatus();
       if (status == "Available")
         ss << " | Status: " << Color::green(status);
       else if (status == "On-Duty")
@@ -79,17 +85,40 @@ void Hero::printHeroList(atomic<bool> &isRunning) {
 }
 
 // Initialize the heroList with 9 heroes (3 Police, 3 Medics, 3 Firefighters)
-vector<Hero> Hero::heroList = {
+vector<Hero*> Hero::heroList = {
     // Police
-    Police("Officer John", 3, "Available"),
-    Police("Officer Sarah", 4, "Available"),
-    Police("Officer Mike", 5, "Available"),
+    new Police("Officer John", 3, "Available"),
+    new Police("Officer Sarah", 4, "Available"),
+    new Police("Officer Mike", 5, "Available"),
     // Medics
-    Medic("Dr. Emily", 3, "Available"), Medic("Dr. James", 4, "Available"),
-    Medic("Dr. Lisa", 5, "Available"),
+    new Medic("Dr. Emily", 3, "Available"),
+    new Medic("Dr. James", 4, "Available"),
+    new Medic("Dr. Lisa", 5, "Available"),
     // Firefighters
-    Firefighter("Chief Tom", 3, "Available"),
-    Firefighter("Captain Alex", 4, "Available"),
-    Firefighter("Lt. Rachel", 5, "Available")};
+    new Firefighter("Chief Tom", 3, "Available"),
+    new Firefighter("Captain Alex", 4, "Available"),
+    new Firefighter("Lt. Rachel", 5, "Available")
+};
 
 // Write polymorphism functions for the heroes from here
+
+bool Medic::canHandle(const string& callType) const {
+  return callType == "Medical";
+}
+int Medic::getResolutionTime() const {
+  return 30 - skillLevel*2; // Higher skill level means faster resolution
+}
+
+bool Police::canHandle(const string& callType) const {
+  return callType == "Crime";
+}
+int Police::getResolutionTime() const {
+  return 40 - skillLevel*3; // Higher skill level means faster resolution
+}
+
+bool Firefighter::canHandle(const string& callType) const {
+  return callType == "Fire";
+}
+int Firefighter::getResolutionTime() const {
+  return 50 - skillLevel*4; // Higher skill level means faster resolution
+} 

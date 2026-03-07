@@ -366,3 +366,19 @@ void StressCall::printCallList(atomic<bool> &isRunning) {
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 }
+// reads the type of call. Returns string.
+string StressCall::getCallType(int index) {
+  std::lock_guard<std::mutex> lock(dataMutex);
+  if (index < 0 || index >= calls.size())
+    return "";
+  return calls[index].getType();
+}
+
+// resolves the call at index. Successfull if hero type matches call type. Returns true if resolved, false otherwise.
+bool StressCall::resolveCall(int index) {
+  std::lock_guard<std::mutex> lock(dataMutex);
+  if (index < 0 || index >= calls.size())
+    return false;
+  calls.erase(calls.begin() + index);
+  return true;
+}
