@@ -17,7 +17,6 @@ void Dashboard::processInput(int callId, int heroId) {
   string msgText = "";
 
   // Dispatch message for display
-
   // Implement message logic here (Handle out of bounds inputs too)
   Hero* hero = Hero::getHeroByIndex(heroId);
   if (hero == nullptr) {
