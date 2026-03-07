@@ -5,6 +5,7 @@ Hero::Hero(const string &heroType)
     : heroType(heroType), name(""), skillLevel(0), status("Available") {}
 
 Hero* Hero::getHeroByIndex(int index) {
+  index--;
   if (index < 0 || index >= heroList.size())
     return nullptr;
   return heroList[index];
