@@ -40,11 +40,12 @@ public:
 
   // setters
   void setStatus(const string &newStatus) { status = newStatus; }
+  void setSkillLevel(int newSkillLevel);
   static Hero* getHeroByIndex(int index);
   // pure virtual function to be implemented by derived classes
   virtual bool canHandle(const string &newStatus) const = 0;
   virtual int getResolutionTime() const = 0;
-
+  void increaseSkillLevel();
   static void printHeroList(atomic<bool> &isRunning);
 };
 

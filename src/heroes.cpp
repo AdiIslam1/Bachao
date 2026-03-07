@@ -11,6 +11,15 @@ Hero* Hero::getHeroByIndex(int index) {
   return heroList[index];
 }
 
+void Hero::setSkillLevel(int newSkillLevel) {
+    skillLevel = newSkillLevel;
+}
+
+void Hero::increaseSkillLevel() {
+  int currentSkill = getSkillLevel();
+  setSkillLevel(currentSkill + 1);  
+}
+
 void Hero::printHeroList(atomic<bool> &isRunning) {
   const int startCol = 100; // Start column for hero list (right side)
 
