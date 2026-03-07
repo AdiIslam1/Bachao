@@ -1,5 +1,6 @@
 #include "heroes.hpp"
 #include <sstream>
+#include "stats.hpp"
 
 Hero::Hero(const string &heroType)
     : heroType(heroType), name(""), skillLevel(0), status("Available") {}

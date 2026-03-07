@@ -12,6 +12,7 @@ using namespace std;
 #include <string>
 #include <thread>
 #include <vector>
+#include <heroes.hpp>
 
 class StressCall {
 private:

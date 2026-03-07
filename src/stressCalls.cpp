@@ -1,5 +1,6 @@
 #include <sstream>
-#include <stressCalls.hpp>
+#include "stressCalls.hpp"
+#include "stats.hpp"
 
 // Define static members
 std::vector<StressCall> StressCall::calls;
@@ -313,6 +314,7 @@ void StressCall::printCallList(atomic<bool> &isRunning) {
             ss << "\033[" << currentRow++ << ";1H";
             ss << "--------------------------------";
           }
+          Stats::addMissed();
           it = calls.erase(it);
         } else {
 
