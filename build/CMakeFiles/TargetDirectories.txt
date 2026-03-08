@@ -1,3 +1,0 @@
-/home/saad/Downloads/Team_OTC/build/CMakeFiles/dispatch_game.dir
-/home/saad/Downloads/Team_OTC/build/CMakeFiles/edit_cache.dir
-/home/saad/Downloads/Team_OTC/build/CMakeFiles/rebuild_cache.dir

@@ -1,1 +1,0 @@
-/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/dispatch_game.dir/link.d CMakeFiles/dispatch_game.dir/src/color.cpp.o CMakeFiles/dispatch_game.dir/src/console_utils.cpp.o CMakeFiles/dispatch_game.dir/src/dashboard.cpp.o CMakeFiles/dispatch_game.dir/src/heroes.cpp.o CMakeFiles/dispatch_game.dir/src/main.cpp.o CMakeFiles/dispatch_game.dir/src/stressCalls.cpp.o -o dispatch_game
