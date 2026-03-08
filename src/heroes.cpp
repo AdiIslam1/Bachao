@@ -120,14 +120,14 @@ int Medic::getResolutionTime() const {
 }
 
 bool Police::canHandle(const string& callType) const {
-  return callType == "Crime";
+  return (callType == "Crime" || callType == "Political");
 }
 int Police::getResolutionTime() const {
   return 40 - skillLevel*3; // Higher skill level means faster resolution
 }
 
 bool Firefighter::canHandle(const string& callType) const {
-  return callType == "Fire";
+  return (callType == "Fire" || callType == "Hazard" || callType == "Disaster");
 }
 int Firefighter::getResolutionTime() const {
   return 50 - skillLevel*4; // Higher skill level means faster resolution

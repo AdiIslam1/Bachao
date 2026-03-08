@@ -16,7 +16,7 @@ vector<Dashboard::Message> Dashboard::messages;
 void Dashboard::processInput(int callId, int heroId) {
   lock_guard<mutex> lock(ConsoleUtils::consoleMutex);
   string msgText = "";
-
+  // bool heroSavedYou = true;
   // Dispatch message for display
   // Implement message logic here (Handle out of bounds inputs too)
   Hero* hero = Hero::getHeroByIndex(heroId);
@@ -28,6 +28,7 @@ void Dashboard::processInput(int callId, int heroId) {
   if (hero->getStatus() != "Available"){
     msgText = Color::red("ERROR: " + hero->getName() + " is currently " + hero->getStatus() + "!");
     messages.push_back(Message(msgText));
+    Stats::addFailure();
     return;
   }
   string callType = StressCall::getCallType(callId);
@@ -39,6 +40,7 @@ void Dashboard::processInput(int callId, int heroId) {
   if (!hero->canHandle(callType)) {
     msgText = Color::red("ERROR: " + hero->getHeroType() + " cannot handle a " + callType + " emergency!");
     messages.push_back(Message(msgText));
+    Stats::addFailure();
     return;
   }
   if(StressCall::resolveCall(callId)){
