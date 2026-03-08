@@ -5,6 +5,7 @@
 #include <heroes.hpp>
 #include <iostream>
 #include <stressCalls.hpp>
+#include "stats.hpp"
 #include <thread>
 using namespace std;
 
@@ -73,7 +74,7 @@ int main() {
     cout << Color::cyan("======================================") << endl;
   }
 
-  int timeToPlay = 120;
+  int timeToPlay = 20;
   atomic<bool> isRunning(true);
 
   StressCall::generate(get_random(2, 4));
@@ -126,6 +127,8 @@ int main() {
   {
     std::lock_guard<std::mutex> lock(ConsoleUtils::consoleMutex);
     cout << "\033[2J\033[H"; // Clear screen at end
+    Stats::printStats();
+    Stats::saveHighestScore();
     cout << "\n" << Color::bold("Thanks for playing") << endl;
   } // Player statistics should be shown here
 }
