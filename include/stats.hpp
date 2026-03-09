@@ -1,6 +1,7 @@
 #ifndef STATS_HPP
 #define STATS_HPP
 #include <mutex>
+#include <string>
 
 class Stats {
 private:
@@ -21,7 +22,8 @@ private:
 
     static int calculateScore();
     static void printStats();
-    static void saveHighestScore();
+    static void saveHighScore(const std::string& playerName);
+    static void printLeaderboard();
 };
 
 #endif
