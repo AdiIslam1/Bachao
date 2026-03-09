@@ -9,6 +9,7 @@
 #include <thread>
 using namespace std;
 
+string playerName;
 int showMenu() {
     int choice;
 
@@ -84,6 +85,9 @@ int main() {
         int choice = showMenu();
 
         if (choice == 1) {
+            cout << "\033[2J\033[H";
+            cout << Color::bold("Enter Player Name: ");
+            cin >> playerName;
             break; // start game
         }
         else if (choice == 2) {
@@ -128,7 +132,8 @@ int main() {
     std::lock_guard<std::mutex> lock(ConsoleUtils::consoleMutex);
     cout << "\033[2J\033[H"; // Clear screen at end
     Stats::printStats();
-    Stats::saveHighestScore();
+    Stats::saveHighScore(playerName);
+    Stats::printLeaderboard();
     cout << "\n" << Color::bold("Thanks for playing") << endl;
   } // Player statistics should be shown here
 }
