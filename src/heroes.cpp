@@ -2,7 +2,7 @@
 #include <sstream>
 
 Hero::Hero(const string &heroType)
-    : heroType(heroType), name(""), skillLevel(0), status("Available") {}
+    : heroType(heroType), name(""), skillLevel(0), status("Available"), stamina(100), maxStamina(100) {}
 
 Hero* Hero::getHeroByIndex(int index) {
   index--;
@@ -78,6 +78,22 @@ void Hero::printHeroList(atomic<bool> &isRunning) {
       else
         ss << " | Status: " << status;
 
+      // stamina bar
+      moveCursorSS(row++, startCol);
+      int barLength = 10;
+      int filled = (hero->getStamina() * barLength) / hero->getMaxStamina();
+      
+      ss << "   Stamina: [";
+      for (int i = 0; i < barLength; i++) {
+          if (i < filled) {
+              // Color it Red if stamina is dangerously low (< 30), otherwise Green
+              if (hero->getStamina() < 30) ss << Color::red("|");
+              else ss << Color::green("|");
+          } else {
+              ss << " "; // Empty space for missing stamina
+          }
+      }
+      ss << "] " << hero->getStamina() << "/" << hero->getMaxStamina();
       moveCursorSS(row++, startCol);
       ss << "--------------------------------";
     }

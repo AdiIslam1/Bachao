@@ -26,6 +26,8 @@ protected:
   string heroType;
   string name;
   int skillLevel;
+  int stamina;
+  int maxStamina;
   string status; // "Available", "On-Duty", "Resting", "Dead"
 
 public:
@@ -37,10 +39,16 @@ public:
   string getName() const { return name; }
   int getSkillLevel() const { return skillLevel; }
   string getStatus() const { return status; }
-
+  int getStamina() const { return stamina; }
+  int getMaxStamina() const { return maxStamina; }
   // setters
   void setStatus(const string &newStatus) { status = newStatus; }
   void setSkillLevel(int newSkillLevel);
+  void setStamina(int newStamina) { stamina = newStamina; }
+  void setMaxStamina(int newMaxStamina) { maxStamina = newMaxStamina; }
+  void increaseStamina(int amount) { stamina = min(stamina + amount, maxStamina); }
+  void decreaseStamina(int amount) { stamina = max(stamina - amount, 0); }
+  // static functions
   static Hero* getHeroByIndex(int index);
   // pure virtual function to be implemented by derived classes
   virtual bool canHandle(const string &newStatus) const = 0;

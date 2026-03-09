@@ -43,9 +43,16 @@ void Dashboard::processInput(int callId, int heroId) {
     Stats::addFailure();
     return;
   }
+  if(hero->getStamina() < 25){
+    msgText = Color::red("ERROR: " + hero->getName() + " is too exhausted to take this call! Please choose another hero or let them rest.");
+    messages.push_back(Message(msgText));
+    Stats::addFailure();
+    return;
+  }
   if(StressCall::resolveCall(callId)){
     Stats::addSuccess();
     hero->setStatus("On-Duty  ");
+    hero->decreaseStamina(25); // Decrease stamina by 25 for taking a call, can be adjusted based on call severity/type
     // get how long it will to resolve the call.
     int resolutionTime = hero->getResolutionTime();
     msgText = Color::green("SUCCESS: ") + hero->getName() + " dispatched! ETA: " + to_string(resolutionTime) + "s.";
@@ -53,6 +60,7 @@ void Dashboard::processInput(int callId, int heroId) {
     // increase hero skill level after successful dispatch
     hero->increaseSkillLevel();
     // Simulate the hero being on-duty for the resolution time, then set them back to available
+    
     thread recoveryThread([hero, resolutionTime]() {
       
       // Wait for them to finish the job
@@ -60,7 +68,8 @@ void Dashboard::processInput(int callId, int heroId) {
       
       // They are tired, let them rest
       hero->setStatus("Resting  ");
-      std::this_thread::sleep_for(std::chrono::seconds(10)); // 10 seconds of rest
+      int restTime = hero->getStamina() <= 25 ? 15 : 8;
+      std::this_thread::sleep_for(std::chrono::seconds(restTime));
       // Ready for action again!
       hero->setStatus("Available");
        
