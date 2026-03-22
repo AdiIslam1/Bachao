@@ -16,6 +16,17 @@
 
 using namespace std;
 
+// Custom Exception Class
+class HeroException : public exception {
+private:
+    string message;
+public:
+    HeroException(const string& msg) : message(msg) {}
+    const char* what() const noexcept override {
+        return message.c_str();
+    }
+};
+
 // Define polymorphic functions for the heroes accordingly
 
 class Hero {
