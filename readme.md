@@ -50,3 +50,39 @@ In the command prompt at the bottom, type the `<Call ID>` followed by the `<Hero
 To send Hero #4 (Dr. Emily) to Call #1 (A Medical Emergency), type:
 ```text
 1 4
+```
+
+---
+
+## 🏗️ Object-Oriented Programming (OOP) Concepts Utilized
+
+BACHAO is engineered using a robust Object-Oriented C++ architecture. Here are the core concepts implemented throughout the codebase:
+
+### 1. Encapsulation & Abstraction
+* **Classes & Access Modifiers:** Foundational models like `StressCall`, `Hero`, `Stats`, and `Dashboard` use `private`, `protected`, and `public` specifiers to hide internal state (like a hero's true `stamina` or exact `status`) and expose only strictly validated getter and setter wrappers.
+* **Nested Classes:** The `Message` class is safely encapsulated *inside* the private scope of the `Dashboard` class, abstracting away the timer strings mapped strictly for internal rendering logic.
+
+### 2. Inheritance
+* **Hierarchical Classification:** `Medic`, `Police`, and `Firefighter` publicly inherit from the base `Hero` class, inheriting members like `name`, `stamina`, and `status`, while keeping specific implementations separated.
+* **Custom Exceptions:** Extensive OOP error handling is achieved via a dedicated `DispatchException` hierarchy (e.g. `InvalidHeroException`, `HeroExhaustedException`) that inherits directly from the standard `std::exception` class.
+
+### 3. Polymorphism & Virtual Functions
+* **Pure Virtual Methods:** The `Hero` base class enforces a uniform behavior contract through pure virtual functions like `virtual bool canHandle(const string& callType) const = 0` and `virtual int getResolutionTime() const = 0`.
+* **Dynamic Binding:** A unified `vector<Hero*> heroList` array takes advantage of runtime polymorphism. The main dispatch loop seamlessly calls `hero->canHandle()` universally, and the C++ engine dynamically routes the query to the correct derived `Medic`, `Police`, or `Firefighter` method depending on the underlying object type.
+
+### 4. Constructors and Destructors
+* **Parameterized Constructors:** Objects are explicitly initialized via parameterized constructors utilizing member initializer lists (e.g. `Hero(...) : heroType(heroType), name("")...`). 
+* **Virtual Destructors:** The `Hero` class provides a `virtual ~Hero() = default;` destructor ensuring that whenever polymorphic base pointers are deleted, the application properly cascades the memory destruction to the specific child objects without leaking.
+
+### 5. File Handling
+* The `Stats` static class seamlessly utilizes `std::ifstream` and `std::ofstream` specifically inside `Stats::saveHighScore()` and `Stats::printLeaderboard()`. This system persistently reads, truncates, overwrites, and organizes the Top 10 Highscore `highscore.txt` text file across multiple play sessions.
+
+### 6. Robust Error Handling (try-catch)
+* The entire command dispatch structure within `Dashboard::processInput()` prevents terminal halting using a massive `try-catch` wrapper. Illegal moves (like deploying exhausted responders) directly `throw` targeted `DispatchException` objects, which are safely caught and translated into visible red UI error logs dynamically rendering the payload of the overridden `.what()` method.
+
+### 7. Constants and Statics
+* **Constant keyword (`const`):** Emphasized aggressively in class getters (e.g. `string getHeroType() const`) to strongly guarantee state-safety inside loops, alongside `const std::vector` databases containing all randomly sourced locations.
+* **Static Storage & Mutex Locks:** Singleton-patterned architectures utilizing `static` variables across `Stats` tracking arrays (`successCount`) alongside heavily `std::mutex` locked static routines protecting critical regions during the multi-threading loop.
+
+### 8. Operator Overloading
+* The `Hero` class provides custom implementations for the unary `operator++` and `operator--`. This allows the application to cleanly increment or decrement a hero's `skillLevel` using expressions like `++(*hero);` instead of traditional mutator functions, naturally enforcing min/max boundaries internally.

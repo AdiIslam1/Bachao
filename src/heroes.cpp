@@ -24,11 +24,20 @@ void Hero::setStatus(const string &newStatus) {
     status = newStatus;
 }
 
-void Hero::increaseSkillLevel() {
-    if (skillLevel > 100) {
-        return;
+Hero& Hero::operator++() {
+    if (skillLevel >= 100) {
+        throw SkillBoundaryException(name, "maximum");
     }
     skillLevel++;
+    return *this;
+}
+
+Hero& Hero::operator--() {
+    if (skillLevel <= 1) {
+        throw SkillBoundaryException(name, "minimum");
+    }
+    skillLevel--;
+    return *this;
 }
 
 Hero* Hero::getHeroByIndex(int index) {

@@ -47,8 +47,14 @@ void Dashboard::processInput(int callId, int heroId) {
       int resolutionTime = hero->getResolutionTime();
       msgText = Color::green("SUCCESS: ") + hero->getName() + " dispatched! ETA: " + to_string(resolutionTime) + "s.";
       messages.push_back(Message(msgText));
+
       // increase hero skill level after successful dispatch
-      hero->increaseSkillLevel();
+      try {
+          ++(*hero);
+      } catch (const SkillBoundaryException& e) {
+          messages.push_back(Message(Color::yellow(e.what())));
+      }
+
       // Simulate the hero being on-duty for the resolution time, then set them back to available
       
       thread recoveryThread([hero, resolutionTime]() {

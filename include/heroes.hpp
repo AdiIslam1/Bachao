@@ -57,6 +57,12 @@ public:
         : DispatchException("ERROR: " + heroName + " is resting! Please choose another hero.") {}
 };
 
+class SkillBoundaryException : public DispatchException {
+public:
+    SkillBoundaryException(const string& heroName, const string& boundary) 
+        : DispatchException("NOTICE: " + heroName + " is already at " + boundary + " skill capacity!") {}
+};
+
 // Define polymorphic functions for the heroes accordingly
 
 class Hero {
@@ -94,7 +100,8 @@ public:
   // pure virtual function to be implemented by derived classes
   virtual bool canHandle(const string &newStatus) const = 0;
   virtual int getResolutionTime() const = 0;
-  void increaseSkillLevel();
+  Hero& operator++(); // Prefix increment for skillLevel
+  Hero& operator--(); // Prefix decrement for skillLevel
   static void printHeroList(atomic<bool> &isRunning);
 };
 
