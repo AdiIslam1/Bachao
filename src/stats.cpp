@@ -50,14 +50,6 @@ int Stats::calculateScore() {
     return successCount * 20 - failureCount * 3 - missedCount * 5;
 }
 
-/*void Stats::printStats() {
-    std::lock_guard<std::mutex> lock(statsMutex);
-    cout << "\n=== GAME STATS ===\n";
-    cout << "Successful Dispatches: " << successCount << endl;
-    cout << "Hero Failures: " << failureCount << endl;
-    cout << "Unattended Calls: " << missedCount << endl;
-    cout << "Total Score: " << calculateScore() << endl;
-}*/
 void Stats::printStats() {
     std::lock_guard<std::mutex> lock(statsMutex);
 
@@ -87,10 +79,10 @@ void Stats::saveHighScore(const string &playerName) {
 
     int currentScore = calculateScore();
 
-    // Step 1: Initialize leaderboard with 10 placeholders
+    // Initialize leaderboard with 10 players (randomly choosing Waiting for no reason)
     vector<pair<string, int>> leaderboard(10, {"Waiting", -1000});
 
-    // Step 2: Overwrite with actual file contents if available
+    // Overwriting with actual file contents if available
     ifstream inFile("highscore.txt");
     string line;
     int i = 0;
@@ -103,7 +95,7 @@ void Stats::saveHighScore(const string &playerName) {
     }
     inFile.close();
 
-    // Step 3: Insert current score into leaderboard
+    // Inserting current score into leaderboard
     bool Top10 = false;
     int pos;
     for (int i = 0; i < 10; i++) {
@@ -118,7 +110,7 @@ void Stats::saveHighScore(const string &playerName) {
     if (leaderboard.size() > 10)
         leaderboard.resize(10);
 
-    // Step 4: Update the file
+    // Updating the file
     ofstream outFile("highscore.txt");
     for (int i = 0; i < 10; i++)
         outFile << leaderboard[i].first << " " << leaderboard[i].second << "\n";
@@ -133,11 +125,10 @@ void Stats::saveHighScore(const string &playerName) {
 
 void Stats::printLeaderboard() {
     lock_guard<mutex> lock(statsMutex);
-
-    // Step 1: Initialize leaderboard with placeholders
+    //Initializing
     vector<pair<string, int>> leaderboard(10, {"Waiting", -1000});
 
-    // Step 2: Overwrite with file contents
+    // Overwriting
     ifstream inFile("highscore.txt");
     string line;
     int i = 0;
@@ -150,7 +141,7 @@ void Stats::printLeaderboard() {
     }
     inFile.close();
 
-    // Step 3: Print neatly
+    // Printing
     cout << "\n" << Color::magenta("=== TOP 10 LEADERBOARD ===") << "\n\n";
     cout << left << setw(5) << "Rank" 
          << setw(15) << "Player" 
@@ -165,6 +156,87 @@ void Stats::printLeaderboard() {
     cout << endl;
 }
 
+void Stats::updateRecords(const string &playerName) {
+    lock_guard<mutex> lock(statsMutex);
 
+    int currentSuccess = successCount;
+    double currentSuccessRate = ((double)successCount*100)/(successCount + failureCount + missedCount);
 
+    // Default values
+    string bestDispatcherName = "Waiting";
+    int bestDispatcherScore = -1000;
+
+    string bestHandlerName = "Waiting";
+    int bestHandlerScore = 0;
+
+    // Reading existing records
+    ifstream inFile("records.txt");
+    if (inFile.is_open()) {
+        string label;
+
+        inFile >> label >> bestDispatcherName >> bestDispatcherScore;
+        inFile >> label >> bestHandlerName >> bestHandlerScore;
+
+        inFile.close();
+    }
+
+    bool newDispatcher = false;
+    bool newHandler = false;
+
+    // Updating Best Dispatcher
+    if (currentSuccess > bestDispatcherScore) {
+        bestDispatcherScore = currentSuccess;
+        bestDispatcherName = playerName;
+        newDispatcher = true;
+    }
+
+    // Updating Best Call Handler (Best call handler implies, the one with the best success rate)
+    if (currentSuccessRate > bestHandlerScore) {
+        bestHandlerScore = currentSuccessRate;
+        bestHandlerName = playerName;
+        newHandler = true;
+    }
+
+    // Write back to file
+    ofstream outFile("records.txt");
+    outFile << "BestDispatcher " << bestDispatcherName << " " << bestDispatcherScore << "\n";
+    outFile << "BestCallHandler " << bestHandlerName << " " << bestHandlerScore << "\n";
+    outFile.close();
+
+    // Messages
+    if (newDispatcher) {
+        cout << Color::bold(Color::yellow("\n>>> NEW BEST DISPATCHER! <<<\n"));
+    }
+
+    if (newHandler) {
+        cout << Color::bold(Color::cyan("\n>>> NEW BEST CALL HANDLER! <<<\n"));
+    }
+}
+
+void Stats::printRecords() {
+    lock_guard<mutex> lock(statsMutex);
+
+    ifstream inFile("records.txt");
+
+    if (!inFile.is_open()) {
+        cout << "\nNo records yet!\n";
+        return;
+    }
+
+    string label, name1, name2;
+    int score1, score2;
+
+    inFile >> label >> name1 >> score1;
+    inFile >> label >> name2 >> score2;
+
+    inFile.close();
+
+    cout << "\n" << Color::magenta("=== ALL-TIME RECORDS ===") << "\n\n";
+
+    cout << Color::yellow("Best Dispatcher: ")
+         << name1 << " (" << score1 << ")" << endl;
+
+    cout << Color::cyan("Best Call Handler: ")
+         << name2 << " (" << score2 << "%)" << endl;
+}
 

@@ -24,6 +24,8 @@ private:
     static void printStats();
     static void saveHighScore(const std::string& playerName);
     static void printLeaderboard();
+    static void updateRecords(const std::string& playerName);
+    static void printRecords();
 };
 
 #endif

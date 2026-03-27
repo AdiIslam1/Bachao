@@ -169,7 +169,9 @@ int main() {
     cout << "\033[2J\033[H"; // Clear screen at end
     Stats::printStats();
     Stats::saveHighScore(playerName);
+    Stats::updateRecords(playerName);
     Stats::printLeaderboard();
+    Stats::printRecords();
     cout << "\n" << Color::bold("Thanks for playing") << endl;
   } // Player statistics should be shown here
 }
