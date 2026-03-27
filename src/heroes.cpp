@@ -3,13 +3,13 @@
 
 // Constructor
 Hero::Hero(const string &heroType)
-    : heroType(heroType), name(""), skillLevel(0), status("Available") {}
+    : heroType(heroType), name(""), skillLevel(0), stamina(100), maxStamina(100), status("Available") {}
 
 // ===================== VALIDATION FUNCTIONS =====================
 
 void Hero::setSkillLevel(int newSkillLevel) {
     if (newSkillLevel < 1 || newSkillLevel > 100) {
-        throw HeroException("Skill level must be between 1 and 100!");
+        return;
     }
     skillLevel = newSkillLevel;
 }
@@ -19,22 +19,23 @@ void Hero::setStatus(const string &newStatus) {
         newStatus != "On-Duty" &&
         newStatus != "Resting" &&
         newStatus != "Dead") {
-        throw HeroException("Invalid hero status!");
+        return;
     }
     status = newStatus;
 }
 
 void Hero::increaseSkillLevel() {
     if (skillLevel > 100) {
-        throw HeroException("Skill level already at maximum!");
+        return;
     }
     skillLevel++;
 }
 
 Hero* Hero::getHeroByIndex(int index) {
+    int inputIndex = index;
     index--;
     if (index < 0 || index >= heroList.size()) {
-        throw HeroException("Invalid hero index!");
+        throw InvalidHeroException(inputIndex);
     }
     return heroList[index];
 }
@@ -76,7 +77,7 @@ void Hero::printHeroList(atomic<bool> &isRunning) {
             int idx = 1;
             for (const auto &hero : heroList) {
                 if (!hero) {
-                    throw HeroException("Null hero pointer detected!");
+                    continue;
                 }
 
                 moveCursorSS(row++, startCol);
@@ -90,7 +91,7 @@ void Hero::printHeroList(atomic<bool> &isRunning) {
                 else if (type == "Firefighter")
                     ss << Color::yellow("[FIREFIGHTER]");
                 else
-                    throw HeroException("Unknown hero type!");
+                    ss << "[UNKNOWN]";
 
                 ss << " " << hero->getName();
 
@@ -98,16 +99,20 @@ void Hero::printHeroList(atomic<bool> &isRunning) {
                 ss << "   Skill Level: " << hero->getSkillLevel();
 
                 string status = hero->getStatus();
+                // Pad status string with spaces to overwrite previous longer statuses (e.g., "Available" vs "On-Duty")
+                string displayStatus = status;
+                while (displayStatus.length() < 9) displayStatus += " ";
+
                 if (status == "Available")
-                    ss << " | Status: " << Color::green(status);
+                    ss << " | Status: " << Color::green(displayStatus);
                 else if (status == "On-Duty")
-                    ss << " | Status: " << Color::yellow(status);
+                    ss << " | Status: " << Color::yellow(displayStatus);
                 else if (status == "Resting")
-                    ss << " | Status: " << Color::cyan(status);
+                    ss << " | Status: " << Color::cyan(displayStatus);
                 else if (status == "Dead")
-                    ss << " | Status: " << Color::red(status);
+                    ss << " | Status: " << Color::red(displayStatus);
                 else
-                    throw HeroException("Unknown hero status!");
+                    ss << " | Status: " << displayStatus;
 
                 moveCursorSS(row++, startCol);
                 ss << "--------------------------------";
@@ -159,9 +164,6 @@ Medic::Medic(const string &name, int skillLevel, const string &status)
 }
 
 bool Medic::canHandle(const string& callType) const {
-    if (callType != "Medical" && callType != "Fire" && callType != "Crime") {
-        throw HeroException("Unknown call type!");
-    }
     return callType == "Medical";
 }
 
@@ -179,10 +181,7 @@ Police::Police(const string &name, int skillLevel, const string &status)
 }
 
 bool Police::canHandle(const string& callType) const {
-    if (callType != "Medical" && callType != "Fire" && callType != "Crime") {
-        throw HeroException("Unknown call type!");
-    }
-    return callType == "Crime";
+    return callType == "Crime" || callType == "Political";
 }
 
 int Police::getResolutionTime() const {
@@ -199,10 +198,7 @@ Firefighter::Firefighter(const string &name, int skillLevel, const string &statu
 }
 
 bool Firefighter::canHandle(const string& callType) const {
-    if (callType != "Medical" && callType != "Fire" && callType != "Crime") {
-        throw HeroException("Unknown call type!");
-    }
-    return callType == "Fire";
+    return callType == "Hazard" || callType == "Disaster";
 }
 
 int Firefighter::getResolutionTime() const {

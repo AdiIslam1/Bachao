@@ -371,9 +371,10 @@ void StressCall::printCallList(atomic<bool> &isRunning) {
 // reads the type of call. Returns string.
 string StressCall::getCallType(int index) {
   std::lock_guard<std::mutex> lock(dataMutex);
+  int inputIndex = index;
   index--;
   if (index < 0 || index >= calls.size())
-    return "";
+    throw InvalidCallException(inputIndex);
   return calls[index].getType();
 }
 

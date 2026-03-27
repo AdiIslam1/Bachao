@@ -19,74 +19,64 @@ void Dashboard::processInput(int callId, int heroId) {
   // bool heroSavedYou = true;
   // Dispatch message for display
   // Implement message logic here (Handle out of bounds inputs too)
-  Hero* hero = Hero::getHeroByIndex(heroId);
-  if (hero == nullptr) {
-    msgText = Color::red("ERROR: Hero ID " + to_string(heroId) + " does not exist!");
-    messages.push_back(Message(msgText));
-    return;
-  }
-  if (hero->getStatus() != "Available"){
-    msgText = Color::red("ERROR: " + hero->getName() + " is currently " + hero->getStatus() + "!");
-    messages.push_back(Message(msgText));
-    Stats::addFailure();
-    return;
-  }
-  string callType = StressCall::getCallType(callId);
-  if (callType == "") {
-    msgText = Color::red("ERROR: Call ID " + to_string(callId) + " is invalid or just expired!");
-    messages.push_back(Message(msgText));
-    return;
-  }
-  if (!hero->canHandle(callType)) {
-    msgText = Color::red("ERROR: " + hero->getHeroType() + " cannot handle a " + callType + " emergency!");
-    messages.push_back(Message(msgText));
-    Stats::addFailure();
-    return;
-  }
-  if(hero->getStamina() < 25){
-    msgText = Color::red("ERROR: " + hero->getName() + " is too exhausted to take this call! Please choose another hero or let them rest.");
-    messages.push_back(Message(msgText));
-    Stats::addFailure();
-    return;
-  }
-  if(StressCall::resolveCall(callId)){
-    Stats::addSuccess();
-    hero->setStatus("On-Duty  ");
-    hero->decreaseStamina(25); // Decrease stamina by 25 for taking a call, can be adjusted based on call severity/type
-    // get how long it will to resolve the call.
-    int resolutionTime = hero->getResolutionTime();
-    msgText = Color::green("SUCCESS: ") + hero->getName() + " dispatched! ETA: " + to_string(resolutionTime) + "s.";
-    messages.push_back(Message(msgText));
-    // increase hero skill level after successful dispatch
-    hero->increaseSkillLevel();
-    // Simulate the hero being on-duty for the resolution time, then set them back to available
+  try {
+    Hero* hero = Hero::getHeroByIndex(heroId);
+    string callType = StressCall::getCallType(callId);
     
-    thread recoveryThread([hero, resolutionTime]() {
-      
-      // Wait for them to finish the job
-      std::this_thread::sleep_for(std::chrono::seconds(resolutionTime));
-      
-      // They are tired, let them rest
-      hero->setStatus("Resting  ");
-      int restTime = hero->getStamina() <= 25 ? 15 : 8;
-      std::this_thread::sleep_for(std::chrono::seconds(restTime));
-      // Ready for action again!
-      hero->setStatus("Available");
-       
-    });
+    if (hero->getStatus() != "Available"){
+      throw HeroUnavailableException(hero->getName(), hero->getStatus());
+    }
     
-    recoveryThread.detach();
-  } else {
-    Stats::addFailure();
-    msgText = Color::red("ERROR: Failed to resolve Call ID " + to_string(callId) + " with Hero ID " + to_string(heroId) + "!");
-    messages.push_back(Message(msgText));
-    return;
-  }
-  // Dummy message box
+    if (!hero->canHandle(callType)) {
+      throw IncompatibleHeroException(hero->getHeroType(), callType);
+    }
+    
+    if(hero->getStamina() < 25){
+      throw HeroExhaustedException(hero->getName());
+    }
+    
+    if(StressCall::resolveCall(callId)){
+      Stats::addSuccess();
+      hero->setStatus("On-Duty");
+      hero->decreaseStamina(25); // Decrease stamina by 25 for taking a call, can be adjusted based on call severity/type
+      // get how long it will to resolve the call.
 
-  msgText = "Dispatching Hero ID " + to_string(heroId) + " to Call Serial " +
-            to_string(callId);
-  messages.push_back(Message(msgText));
+      msgText = "Dispatching Hero ID " + to_string(heroId) + " to Call Serial " + to_string(callId);
+      messages.push_back(Message(msgText));
+
+      int resolutionTime = hero->getResolutionTime();
+      msgText = Color::green("SUCCESS: ") + hero->getName() + " dispatched! ETA: " + to_string(resolutionTime) + "s.";
+      messages.push_back(Message(msgText));
+      // increase hero skill level after successful dispatch
+      hero->increaseSkillLevel();
+      // Simulate the hero being on-duty for the resolution time, then set them back to available
+      
+      thread recoveryThread([hero, resolutionTime]() {
+        
+        // Wait for them to finish the job
+        std::this_thread::sleep_for(std::chrono::seconds(resolutionTime));
+        
+        // They are tired, let them rest
+        hero->setStatus("Resting");
+        int restTime = hero->getStamina() <= 25 ? 15 : 8;
+        std::this_thread::sleep_for(std::chrono::seconds(restTime));
+        // Ready for action again!
+        hero->setStatus("Available");
+         
+      });
+      
+      recoveryThread.detach();
+      
+    } else {
+      Stats::addFailure();
+      msgText = Color::red("ERROR: Failed to resolve Call ID " + to_string(callId) + " with Hero ID " + to_string(heroId) + "!");
+      messages.push_back(Message(msgText));
+    }
+    
+  } catch (const DispatchException& e) {
+    messages.push_back(Message(Color::red(e.what())));
+    Stats::addFailure();
+  }
 }
 
 void Dashboard::renderInputArea() {

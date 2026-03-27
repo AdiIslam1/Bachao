@@ -16,15 +16,45 @@
 
 using namespace std;
 
-// Custom Exception Class
-class HeroException : public exception {
-private:
-    string message;
+// Custom Exception Classes for the Dashboard Dispatch Logic
+class DispatchException : public exception {
+protected:
+    string errorMessage;
 public:
-    HeroException(const string& msg) : message(msg) {}
+    DispatchException(const string& msg) : errorMessage(msg) {}
     const char* what() const noexcept override {
-        return message.c_str();
+        return errorMessage.c_str(); 
     }
+};
+
+class InvalidHeroException : public DispatchException {
+public:
+    InvalidHeroException(int heroId) 
+        : DispatchException("ERROR: Hero ID " + to_string(heroId) + " does not exist!") {}
+};
+
+class InvalidCallException : public DispatchException {
+public:
+    InvalidCallException(int callId) 
+        : DispatchException("ERROR: Call ID " + to_string(callId) + " is invalid or just expired!") {}
+};
+
+class HeroUnavailableException : public DispatchException {
+public:
+    HeroUnavailableException(const string& heroName, const string& status)
+        : DispatchException("ERROR: " + heroName + " is currently " + status + "!") {}
+};
+
+class IncompatibleHeroException : public DispatchException {
+public:
+    IncompatibleHeroException(const string& heroType, const string& callType)
+        : DispatchException("ERROR: " + heroType + " cannot handle a " + callType + " emergency!") {}
+};
+
+class HeroExhaustedException : public DispatchException {
+public:
+    HeroExhaustedException(const string& heroName) 
+        : DispatchException("ERROR: " + heroName + " is resting! Please choose another hero.") {}
 };
 
 // Define polymorphic functions for the heroes accordingly
