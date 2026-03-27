@@ -4,7 +4,7 @@
 #include <limits>
 #include <sstream>
 #include <unistd.h>
-
+#include "random"
 // IMPORTANT
 
 // Terminal dimensions MUST be 155 x 50 or higher. Lower will break the output.
@@ -23,37 +23,55 @@ void Dashboard::processInput(int callId, int heroId) {
     Hero* hero = Hero::getHeroByIndex(heroId);
     string callType = StressCall::getCallType(callId);
     
+    bool heroValid = true;
     if (hero->getStatus() != "Available"){
+      heroValid = false;
       throw HeroUnavailableException(hero->getName(), hero->getStatus());
     }
     
     if (!hero->canHandle(callType)) {
+      heroValid = false;
       throw IncompatibleHeroException(hero->getHeroType(), callType);
     }
     
     if(hero->getStamina() < 25){
+      heroValid = false;
       throw HeroExhaustedException(hero->getName());
       Stats::addFailure();
     }
     
-    if(StressCall::resolveCall(callId)){
-      Stats::addSuccess();
+    if(heroValid){
       hero->setStatus("On-Duty");
-      hero->decreaseStamina(25); // Decrease stamina by 25 for taking a call, can be adjusted based on call severity/type
-      // get how long it will to resolve the call.
+      hero->decreaseStamina(25); // Decrease stamina by 25 for taking a call
+
+      // computing success probability
+      random_device rd;
+      mt19937 gen(rd());
+      uniform_int_distribution<> distrib(1, 100);
+      int roll = distrib(gen);
+      int successChance = min(100, 50 + (hero->getSkillLevel() * 8)); // Base 50% + 8% per skill level, capped at 100% 
+      bool success = (roll <= successChance);
 
       msgText = "Dispatching Hero ID " + to_string(heroId) + " to Call Serial " + to_string(callId);
       messages.push_back(Message(msgText));
-
+      // get how long it will to resolve the call.
       int resolutionTime = hero->getResolutionTime();
-      msgText = Color::green("SUCCESS: ") + hero->getName() + " dispatched! ETA: " + to_string(resolutionTime) + "s.";
-      messages.push_back(Message(msgText));
-
-      // increase hero skill level after successful dispatch
-      try {
-          ++(*hero);
-      } catch (const SkillBoundaryException& e) {
-          messages.push_back(Message(Color::yellow(e.what())));
+      if(success){
+        StressCall::resolveCall(callId);
+        Stats::addSuccess();
+        msgText = Color::green("SUCCESS: ") + hero->getName() + " dispatched! ETA: " + to_string(resolutionTime) + "s.";
+        messages.push_back(Message(msgText));
+        // increase hero skill level after successful dispatch
+        try {
+            ++(*hero);
+        } catch (const SkillBoundaryException& e) {
+            messages.push_back(Message(Color::yellow(e.what())));
+        }
+      }
+      else{
+        Stats::addFailure();
+        msgText = Color::red("FAILED: ") + hero->getName() + " failed to resolve the call! Send backup Immediately.";
+        messages.push_back(Message(msgText));
       }
 
       // Simulate the hero being on-duty for the resolution time, then set them back to available
