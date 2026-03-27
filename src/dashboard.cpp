@@ -33,6 +33,7 @@ void Dashboard::processInput(int callId, int heroId) {
     
     if(hero->getStamina() < 25){
       throw HeroExhaustedException(hero->getName());
+      Stats::addFailure();
     }
     
     if(StressCall::resolveCall(callId)){
