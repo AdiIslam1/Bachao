@@ -53,7 +53,7 @@ public:
   int getStamina() const { return stamina; }
   int getMaxStamina() const { return maxStamina; }
   // setters
-  void setStatus(const string &newStatus) { status = newStatus; }
+  void setStatus(const string &newStatus);
   void setSkillLevel(int newSkillLevel);
   void setStamina(int newStamina) { stamina = newStamina; }
   void setMaxStamina(int newMaxStamina) { maxStamina = newMaxStamina; }
@@ -70,36 +70,21 @@ public:
 
 class Medic : public Hero {
 public:
-  Medic(const string &name, int skillLevel, const string &status)
-      : Hero("Medic") {
-    this->name = name;
-    this->skillLevel = skillLevel;
-    this->status = status;
-  };
+  Medic(const string &name, int skillLevel, const string &status);
   bool canHandle(const string& callType) const override;
   int getResolutionTime() const override;
 };
 
 class Police : public Hero {
 public:
-  Police(const string &name, int skillLevel, const string &status)
-      : Hero("Police") {
-    this->name = name;
-    this->skillLevel = skillLevel;
-    this->status = status;
-  };
+  Police(const string &name, int skillLevel, const string &status);
   bool canHandle(const string& callType) const override;
   int getResolutionTime() const override;
 };
 
 class Firefighter : public Hero {
 public:
-  Firefighter(const string &name, int skillLevel, const string &status)
-      : Hero("Firefighter") {
-    this->name = name;
-    this->skillLevel = skillLevel;
-    this->status = status;
-  };
+  Firefighter(const string &name, int skillLevel, const string &status);
   bool canHandle(const string& callType) const override;
   int getResolutionTime() const override;
 };
