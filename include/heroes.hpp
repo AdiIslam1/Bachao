@@ -102,6 +102,7 @@ public:
   virtual int getResolutionTime() const = 0;
   Hero& operator++(); // Prefix increment for skillLevel
   Hero& operator--(); // Prefix decrement for skillLevel
+  // hero-wise stamina decrease
   static void printHeroList(atomic<bool> &isRunning);
 };
 
