@@ -8,7 +8,7 @@ Hero::Hero(const string &heroType)
 // ===================== VALIDATION FUNCTIONS =====================
 
 void Hero::setSkillLevel(int newSkillLevel) {
-    if (newSkillLevel < 1 || newSkillLevel > 100) {
+    if (newSkillLevel < 1 || newSkillLevel > 10) {
         return;
     }
     skillLevel = newSkillLevel;
@@ -25,7 +25,7 @@ void Hero::setStatus(const string &newStatus) {
 }
 
 Hero& Hero::operator++() {
-    if (skillLevel >= 100) {
+    if (skillLevel >= 10) {
         throw SkillBoundaryException(name, "maximum");
     }
     skillLevel++;
@@ -166,17 +166,17 @@ void Hero::printHeroList(atomic<bool> &isRunning) {
 // ===================== HERO LIST INIT =====================
 
 vector<Hero*> Hero::heroList = {
-    new Police("Officer John", 3, "Available"),
-    new Police("Officer Sarah", 4, "Available"),
-    new Police("Officer Mike", 5, "Available"),
+    new Police("Officer John", 1, "Available"),
+    new Police("Officer Sarah", 1, "Available"),
+    new Police("Officer Mike", 1, "Available"),
 
-    new Medic("Dr. Emily", 3, "Available"),
-    new Medic("Dr. James", 4, "Available"),
-    new Medic("Dr. Lisa", 5, "Available"),
+    new Medic("Dr. Emily", 1, "Available"),
+    new Medic("Dr. James", 1, "Available"),
+    new Medic("Dr. Lisa", 1, "Available"),
 
-    new Firefighter("Chief Tom", 3, "Available"),
-    new Firefighter("Captain Alex", 4, "Available"),
-    new Firefighter("Lt. Rachel", 5, "Available")
+    new Firefighter("Chief Tom", 1, "Available"),
+    new Firefighter("Captain Alex", 1, "Available"),
+    new Firefighter("Lt. Rachel", 1, "Available")
 };
 
 // ===================== DERIVED CLASS IMPLEMENTATIONS =====================
