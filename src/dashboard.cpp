@@ -86,7 +86,10 @@ void Dashboard::processInput(int callId, int heroId) {
         int restTime = hero->getStamina() <= 25 ? 15 : 8;
         std::this_thread::sleep_for(std::chrono::seconds(restTime));
         // Ready for action again!
-        hero->setStatus("Available");
+        if(hero->getStamina() == 0){
+          hero->setStatus("Dead");
+        }else
+          hero->setStatus("Available");
          
       });
       
